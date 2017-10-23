@@ -1,3 +1,4 @@
+import pandas as pd
 import pymysql
 
 hostname = 'localhost'
@@ -6,56 +7,52 @@ password = 'root'
 database = 'library'
 
 myConnection = pymysql.connect( host=hostname, user=username, passwd=password, db=database)
+cur = myConnection.cursor()
+cur.execute("DELETE FROM Book;")
+cur.execute("DELETE FROM Book_Authors;")
+cur.execute("DELETE FROM Authors;")
+cur.execute("ALTER TABLE Book_Authors AUTO_INCREMENT = 1;")
+cur.execute("ALTER TABLE Authors AUTO_INCREMENT = 1;")
+cur.execute("ALTER TABLE Borrower AUTO_INCREMENT = 1;")
+cur.execute("ALTER TABLE Book_Loans AUTO_INCREMENT = 1;")
 
-def createTableBook(conn):
-    cur = conn.cursor()
-    query = 'CREATE TABLE Book(Isbn VARCHAR(10) NOT NULL,ISBN13 VARCHAR(13) NOT NULL, Title VARCHAR(255), Availability INT NOT NULL DEFAULT 1, CONSTRAINT BKPK PRIMARY KEY(Isbn));'
-    cur.execute(query)
-    print("Created Table Book")
+books = pd.read_csv('books-original.csv')
+borrowers = pd.read_csv('borrowers.csv')
 
+def insertIntoBook(conn, data, key):
+	isbn10 = data.get_value(key,'ISBN10')
+	isbn13 = data.get_value(key,'ISBN13')
+	title = data.get_value(key,'Title')
+	authors = str(data.get_value(key,'Author')).split(',')
+	availabitity = 1
+	cur = conn.cursor()
+	query = 'INSERT INTO Book VALUES("'+ str(isbn10) +'","'+ str(isbn13) +'","'+ str(title) +'","'+ str(availabitity) +'");'
+	cur.execute(query)
 
-def createTableBookAuthors(conn):
-    cur = conn.cursor()
-    query = 'CREATE TABLE Book_Authors(Author_id INT NOT NULL AUTO_INCREMENT, Isbn VARCHAR(10), CONSTRAINT BKAPK PRIMARY KEY(Author_id), CONSTRAINT BKAFK FOREIGN KEY(Isbn) REFERENCES Book(Isbn) ON DELETE SET NULL);'
-    cur.execute(query)
-    print("Created Table Book_Authors")
+	for author in authors:
+		query1 = 'INSERT INTO Book_Authors(Isbn) VALUES("'+ str(isbn10) +'");'
+		cur.execute(query1)
+	
+	for author in authors:
+		query2 = 'INSERT INTO Authors(Name) VALUES("'+ author +'");'
+		cur.execute(query2)
 
+def insertIntoBorrower(conn, data, key):
+	ssn = str(data.get_value(key,'id'))
+	bname = str(data.get_value(key,'first_name')) +" "+ str(data.get_value(key,'last_name'))
+	address = str(data.get_value(key,'address')) +","+ str(data.get_value(key,'city')) +","+ str(data.get_value(key,'state'))
+	phone = str(data.get_value(key,'phone'))
 
-def createTableAuthors(conn):
-    cur = conn.cursor()
-    query = 'CREATE TABLE Authors(Author_id INT NOT NULL AUTO_INCREMENT, Name VARCHAR(255) NOT NULL, CONSTRAINT ATHPK PRIMARY KEY(Author_id), CONSTRAINT ATHFK FOREIGN KEY(Author_id) REFERENCES Book_Authors(Author_id) ON DELETE CASCADE);'
-    cur.execute(query)
-    print("Created Table Authors")
+	query = 'INSERT INTO Borrower(Ssn,Bname,Address,Phone) VALUES("'+ ssn +'","'+ bname +'","'+ address +'","'+ phone +'");'
+	cur.execute(query)
 
+for i in range(1,len(books)+1):
+	insertIntoBook(myConnection,books[i-1:i],i-1)
 
-def createTableBorrower(conn):
-    cur = conn.cursor()
-    query = 'CREATE TABLE Borrower(Card_id INT NOT NULL AUTO_INCREMENT, Ssn VARCHAR(9) NOT NULL UNIQUE, Bname VARCHAR(255), Address VARCHAR(255), Phone VARCHAR(14), CONSTRAINT BRPK PRIMARY KEY(Card_id));'
-    cur.execute(query)
-    print("Created Table Borrower")
+for i in range(1,len(borrowers)+1):
+	insertIntoBorrower(myConnection,borrowers[i-1:i],i-1)
 
-def createTableBookLoans(conn):
-    cur = conn.cursor()
-    query = 'CREATE TABLE Book_Loans(Loan_id INT NOT NULL AUTO_INCREMENT, Isbn VARCHAR(10),Card_id INT, Date_out DATE, Due_date DATE, Date_in DATE, CONSTRAINT BKLPK PRIMARY KEY(Loan_id), CONSTRAINT BKLFK FOREIGN KEY(Isbn) REFERENCES Book(Isbn) ON DELETE SET NULL, CONSTRAINT BKLFKB FOREIGN KEY(Card_id) REFERENCES Borrower(Card_id) ON DELETE SET NULL);'
-    cur.execute(query)
-    print("Created Table Book Loans")
+print("Successfully initialized all tables")
 
-def createTableFines(conn):
-    cur = conn.cursor()
-    query = 'CREATE TABLE Fines(Loan_id INT NOT NULL , Fine_amt REAL NOT NULL DEFAULT 0, CONSTRAINT FNPK PRIMARY KEY(Loan_id), CONSTRAINT FOREIGN KEY(Loan_id) REFERENCES Book_Loans(Loan_id) ON DELETE CASCADE);'
-    cur.execute(query)
-    print("Created Table Fines")
-
-
-cursor = myConnection.cursor()
-cursor.execute("DROP SCHEMA library;")
-cursor.execute("CREATE SCHEMA library;")
-cursor.execute("USE library;")
-
-createTableBook(myConnection)
-createTableBookAuthors(myConnection)
-createTableAuthors(myConnection)
-createTableBorrower(myConnection)
-createTableBookLoans(myConnection)
-createTableFines(myConnection)
+myConnection.commit()
 myConnection.close()
