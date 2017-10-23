@@ -32,7 +32,7 @@ def index(request):
 			cursor.execute(query)
 
 			if(cursor.fetchone() != None):
-				query = "SELECT COUNT(Loan_id) FROM Book_Loans WHERE Book_loans.Card_id = '"+cardno+"' AND Book_Loans.Date_in IS NULL GROUP BY Book_Loans.Card_id"
+				query = "SELECT COUNT(Loan_id) FROM Book_Loans WHERE Book_Loans.Card_id = '"+cardno+"' AND Book_Loans.Date_in IS NULL GROUP BY Book_Loans.Card_id"
 				cursor.execute(query)
 				result = cursor.fetchone()
 				if(result == None):
