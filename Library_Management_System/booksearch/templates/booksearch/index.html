@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Book Search</title>
+</head>
+<body>
+	<h1>
+		Search for Books.
+	</h1>
+
+	<form action="{% url 'booksearch:index' %}" method="post">
+		{% csrf_token %}
+		<input type="text" name="search" value="" />
+		<input type="submit" name="searchbtn">
+	</form>
+
+	{% if books %}	
+		<div>
+			Here are all books available
+			<table border="1" width="80%" align="center">
+			<tr>
+				<th>Isbn</th>
+				<th>Title</th>
+				<th>Author</th>
+				<th>Available</th>
+				<th>Check out</th>
+			</tr>
+			{% for book in books %}
+			<tr>
+				<td>{{ book.0 }}</td>
+				<td>{{ book.1 }}</td>
+				<td>{{ book.2 }}</td>
+				<td>
+					{% if book.3 == 1 %}
+						Yes
+					{% else %}
+						No
+					{% endif %}
+				</td>
+				<td>
+					<form action="{% url 'booksearch:index' %}" method="POST" id="card_no_form">
+						{% csrf_token %}
+						<input type="hidden" name="cardno" id="cardNo" value = {{book.0}} />
+					</form>
+					<button onclick="askCardNo();" name="checkout">Check Out</button>
+				</td>
+			</tr>
+			{% endfor %}
+			</table>
+		</div>
+	{% else %}
+		<h3>No Books Available</h3>
+	{% endif %}
+
+	<div id="loanInfo">
+		{% if message %}
+			{{ message }}
+		{% endif %}
+	</div>
+
+	<script type="text/javascript">
+		function askCardNo()
+		{
+			var card_no = prompt("Enter Card Number");
+			if(card_no != null)
+			{
+				var isbn = document.getElementById('cardNo').value 
+				document.getElementById('cardNo').value = card_no +','+isbn;
+				document.getElementById('card_no_form').submit();
+			}
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Checkin Books</title>
+</head>
+<body>
+	<h1>Welcome to checkin books module</h1>
+
+	<form action="{% url 'checkinbooks:index' %}" method="post">
+		{% csrf_token %}
+		<input type="text" name="checkin" value="" />
+		<input type="submit" name="searchbtn">
+	</form>
+
+	{% if books %}	
+		<div>
+			Heres what we found...
+			<table border="1" width="80%" align="center">
+			<tr>
+				<th>Isbn</th>
+				<th>Title</th>
+				<th>Author</th>
+				<th>Card Number</th>
+				<th>Borrower Name</th>
+				<th>Ssn</th>
+				<th>Check In</th>
+			</tr>
+			{% for book in books %}
+			<tr>
+				<td>{{ book.0 }}</td>
+				<td>{{ book.1 }}</td>
+				<td>{{ book.2 }}</td>
+				<td>{{ book.3 }}</td>
+				<td>{{ book.4 }}</td>
+				<td>{{ book.5 }}</td>
+				<td>
+					<form action="{% url 'checkinbooks:index' %}" method="POST" id="card_no_form">
+						{% csrf_token %}
+						<input type="hidden" name="isbnrtbk" value = {{book.0}} />
+						<input type="hidden" name="loanid" value = {{book.6}} />
+						<input type="submit" name="checkinbtn" value="Check-In" />
+					</form>
+				</td>
+			</tr>
+			{% endfor %}
+			</table>
+		</div>
+	{% else %}
+		<h3>No Books Available</h3>
+	{% endif %}
+
+	<div id="loanInfo">
+		{% if message %}
+			{{ message }}
+		{% endif %}
+	</div>
+
+</body>
+</html>

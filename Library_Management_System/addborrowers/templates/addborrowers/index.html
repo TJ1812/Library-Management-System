@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Add Borrowers</title>
+</head>
+<body>
+	<h1>Please fill the information below</h1>
+	<table>
+		<form action="{% url 'addborrowers:index' %}" method="POST">
+			{% csrf_token %}
+			<tr>
+				<td>Full Name</td>
+				<td><input type="text" name="fname" required="1" /></td>
+			</tr>
+			<tr>
+				<td>SSN</td>
+				<td><input type="text" name="ssn" required="1" /></td>
+			</tr>
+			<tr>
+				<td>Address</td>
+				<td><input type="text" name="address" required="1" /></td>
+			</tr>
+			<tr>
+				<td>Phone</td>
+				<td><input type="text" name="phone" required="1" /></td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center"><input type="submit" value="Add" name="addborrower"></td>
+			</tr>
+		</form>
+	</table>
+
+	{% if ssnexist %}
+		SSN already exists, please try again
+	{% else %}
+		{% if message %}
+			{{message}}
+		{% endif %}
+	{% endif %}
+</body>
+</html>

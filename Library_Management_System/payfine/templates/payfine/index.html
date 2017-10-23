@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Pay Fine</title>
+</head>
+<body>
+	<h1>
+		Welcome to Pay Fines Module
+	</h1>
+
+	<form action="{% url 'payfine:index' %}" method="post">
+		{% csrf_token %}
+		<input type="text" name="searchfines"/>
+		<input type="submit" name="searchfinesbtn" value="Search">
+	</form>
+
+
+	<form action="{% url 'payfine:index' %}" method="post">
+		{% csrf_token %}
+		<input type="submit" value="Refresh Fines" name="refreshfines">
+	</form>
+
+	{% if fines %}	
+		<div>
+			Heres what we found...
+			<table border="1" width="80%" align="center">
+			<tr>
+				<th>Card Number</th>
+				<th>Ssn</th>
+				<th>Full Name</th>
+				<th>Fine Amount</th>
+				<th>Pay</th>
+			</tr>
+			{% for fine in fines %}
+			<tr>
+				<td>{{ fine.0 }}</td>
+				<td>{{ fine.1 }}</td>
+				<td>{{ fine.2 }}</td>
+				<td>{{ fine.3 }}</td>
+				<td>
+					<form action="{% url 'payfine:index' %}" method="POST">
+						{% csrf_token %}
+						<input type="hidden" name="cardnumber" value = {{fine.0}} />
+						<input type="submit" name="paybtn" value="Pay" />
+					</form>
+				</td>
+			</tr>
+			{% endfor %}
+			</table>
+		</div>
+	{% else %}
+		<h3>No Fines Available</h3>
+	{% endif %}
+
+	<div id="loanInfo">
+		{% if message %}
+			{{ message }}
+		{% endif %}
+	</div>
+</body>
+</html>
