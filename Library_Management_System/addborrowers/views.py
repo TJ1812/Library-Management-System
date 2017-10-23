@@ -19,7 +19,7 @@ def index(request):
 		if(cursor.fetchone() != None):
 			ssnexist = True
 		else:
-			query = 'INSERT INTO BORROWER(Ssn,Bname,Address,Phone) VALUES("'+ ssn +'","'+ fname +'","'+ address +'","'+ phone +'");'
+			query = 'INSERT INTO Borrower(Ssn,Bname,Address,Phone) VALUES("'+ ssn +'","'+ fname +'","'+ address +'","'+ phone +'");'
 			cursor.execute(query)
 			message = "Successfully added the borrower"
 
