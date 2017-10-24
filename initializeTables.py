@@ -15,18 +15,18 @@ cur.execute("ALTER TABLE Book_Authors AUTO_INCREMENT = 1;")
 cur.execute("ALTER TABLE Authors AUTO_INCREMENT = 1;")
 cur.execute("ALTER TABLE Borrower AUTO_INCREMENT = 1;")
 cur.execute("ALTER TABLE Book_Loans AUTO_INCREMENT = 1;")
+cur.execute("ALTER TABLE Fines AUTO_INCREMENT = 1;")
 
-books = pd.read_csv('books-original.csv')
+books = pd.read_csv('books.csv')
 borrowers = pd.read_csv('borrowers.csv')
 
 def insertIntoBook(conn, data, key):
 	isbn10 = data.get_value(key,'ISBN10')
-	isbn13 = data.get_value(key,'ISBN13')
 	title = data.get_value(key,'Title')
 	authors = str(data.get_value(key,'Author')).split(',')
 	availabitity = 1
 	cur = conn.cursor()
-	query = 'INSERT INTO Book VALUES("'+ str(isbn10) +'","'+ str(isbn13) +'","'+ str(title) +'","'+ str(availabitity) +'");'
+	query = 'INSERT INTO Book VALUES("'+ str(isbn10) +'","'+ str(title) +'","'+ str(availabitity) +'");'
 	cur.execute(query)
 
 	for author in authors:

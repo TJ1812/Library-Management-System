@@ -7,8 +7,10 @@ cursor = connection.cursor()
 def index(request):
 	fines = ""
 	message = ""
+	get = True
 	if(request.method == 'POST'):
 		if('searchfines' in request.POST):
+			get = False
 			keywords = request.POST['searchfines'].split(',')
 			comparision = ""
 			for keyword in keywords:
@@ -22,7 +24,7 @@ def index(request):
 			cursor.execute(query)
 			print(query)
 			fines = cursor.fetchall()
-			return render(request,'payfine/index.html',{'fines':fines,'message':message})
+			return render(request,'payfine/index.html',{'fines':fines,'message':message,'get':get})
 
 		elif('refreshfines' in request.POST):
 			query = "SELECT Loan_id, DATEDIFF(CURDATE(),Due_date)*0.25 difference FROM Book_Loans WHERE DATEDIFF(CURDATE(),Due_date)*0.25 > '0'"
@@ -39,7 +41,7 @@ def index(request):
 					cursor.execute(query)
 
 			message = "Successfully Refreshed Fines"
-			return render(request,'payfine/index.html',{'fines':fines,'message':message})
+			return render(request,'payfine/index.html',{'fines':fines,'message':message,'get':get})
 
 		elif('cardnumber' in request.POST):
 			cardnumber = request.POST['cardnumber']
@@ -50,10 +52,10 @@ def index(request):
 				query = "UPDATE Fines SET Fines.Paid = '1' WHERE Fines.Loan_id = '"+str(loanid[0])+"' AND Fines.Paid = '0'"
 				cursor.execute(query)
 			message = "Payment Successful."
-			return render(request,'payfine/index.html',{'fines':fines,'message':message})
+			return render(request,'payfine/index.html',{'fines':fines,'message':message,'get':get})
 
 		else:
 			message = "Something went wrong please try again."
-			return render(request,'payfine/index.html',{'fines':fines,'message':message})
+			return render(request,'payfine/index.html',{'fines':fines,'message':message,'get':get})
 	else:
-		return render(request,'payfine/index.html',{'fines':fines,'message':message})
+		return render(request,'payfine/index.html',{'fines':fines,'message':message,'get':get})

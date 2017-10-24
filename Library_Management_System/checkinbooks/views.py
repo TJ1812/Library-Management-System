@@ -7,8 +7,10 @@ cursor = connection.cursor()
 def index(request):
 	books = ""
 	message = ""
+	get = True
 	if(request.method == "POST"):
 		if('checkin' in request.POST):
+			get = False
 			keywords = request.POST['checkin'].split(',')
 			comparision = ""
 			for keyword in keywords:
@@ -21,8 +23,9 @@ def index(request):
 			query = "SELECT BkAthr.Isbn, BkAthr.Title, BkAthr.authors, BkAthr.Card_id, BkAthr.Bname, BkAthr.Ssn, BkAthr.Loan_id FROM (SELECT Book.Isbn, Book.Title, GROUP_CONCAT(Authors.Name) authors, Borrower.Card_id, Borrower.Bname, Borrower.Ssn, Book_Loans.Loan_id FROM Book,Book_Authors,Authors,Borrower,Book_Loans WHERE Book.Isbn = Book_Authors.Isbn AND Book_Authors.Author_id = Authors.Author_id AND Book.Isbn = Book_Loans.Isbn AND Borrower.Card_id = Book_Loans.Card_id AND Book_Loans.Date_in IS NULL GROUP BY Book.Isbn) AS BkAthr WHERE "+comparision
 			cursor.execute(query)
 			books = cursor.fetchall()
-			return render(request,'checkinbooks/index.html',{'books':books,'message':""})
+			return render(request,'checkinbooks/index.html',{'books':books,'message':message,'get':get})
 		elif('loanid' in request.POST):
+			get = False
 			loan_id = request.POST['loanid']
 			isbn = request.POST['isbnrtbk'] 
 			query = "UPDATE Book_Loans SET Date_in = CURDATE() WHERE Loan_id = '"+ loan_id +"'"
@@ -50,10 +53,9 @@ def index(request):
 			query = "UPDATE Book SET Availability = '1' WHERE Isbn = '"+isbn+"'"
 			cursor.execute(query)
 			message += "successfully checked in book."
-			return render(request,'checkinbooks/index.html',{'Books':books,'message':message})
+			return render(request,'checkinbooks/index.html',{'Books':books,'message':message, 'get':get})
 		else:
 			message = "Please try again."
-			return render(request,'checkinbooks/index.html',{'Books':books,'message':message})	
+			return render(request,'checkinbooks/index.html',{'Books':books,'message':message, 'get':get})	
 	else:
-		message = "Search for books to check in!"
-		return render(request,'checkinbooks/index.html',{'Books':books,'message':message})
+		return render(request,'checkinbooks/index.html',{'Books':books,'message':message, 'get':get})

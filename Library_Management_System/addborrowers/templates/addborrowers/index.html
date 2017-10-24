@@ -2,40 +2,62 @@
 <html>
 <head>
 	<title>Add Borrowers</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+ 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-	<h1>Please fill the information below</h1>
-	<table>
-		<form action="{% url 'addborrowers:index' %}" method="POST">
-			{% csrf_token %}
-			<tr>
-				<td>Full Name</td>
-				<td><input type="text" name="fname" required="1" /></td>
-			</tr>
-			<tr>
-				<td>SSN</td>
-				<td><input type="text" name="ssn" required="1" /></td>
-			</tr>
-			<tr>
-				<td>Address</td>
-				<td><input type="text" name="address" required="1" /></td>
-			</tr>
-			<tr>
-				<td>Phone</td>
-				<td><input type="text" name="phone" required="1" /></td>
-			</tr>
-			<tr>
-				<td colspan="2" align="center"><input type="submit" value="Add" name="addborrower"></td>
-			</tr>
-		</form>
-	</table>
+	<nav class="navbar navbar-inverse">
+	  <div class="container-fluid">
+	    <div class="navbar-header">
+	      <a class="navbar-brand" href="../">Library Management System</a>
+	    </div>
+	    <ul class="nav navbar-nav">
+	      <li><a href="../booksearch">Book Search</a></li>
+	      <li><a href="../checkinbooks">Check-In</a></li>
+	      <li><a href="../payfine">Pay Fine</a></li>
+	      <li><a href="../addborrowers">Add Borrowers</a></li>
+	    </ul>
+	  </div>
+	</nav>
+	<section align="center">
+		<h1>Please fill the information below</h1>
+		<table align="center">
+			<form align="center" action="{% url 'addborrowers:index' %}" method="POST" class="form-inline">
+				<div class="form-group">
+					{% csrf_token %}
+					<tr>
+						<td>Full Name</td>
+						<td><input type="text" name="fname" class="form-control" required="1" /></td>
+					</tr>
+					<tr>
+						<td>SSN</td>
+						<td><input type="text" name="ssn" class="form-control" required="1" /></td>
+					</tr>
+					<tr>
+						<td>Address</td>
+						<td><input type="text" name="address" class="form-control" required="1" /></td>
+					</tr>
+					<tr>
+						<td>Phone</td>
+						<td><input type="text" name="phone" class="form-control" required="1" /></td>
+					</tr>
+					<tr>
+						<td colspan="2" align="center"><input type="submit" class="btn btn-success" value="Add" name="addborrower"></td>
+					</tr>
+				</div>
+			</form>
+		</table>
 
-	{% if ssnexist %}
-		SSN already exists, please try again
-	{% else %}
-		{% if message %}
-			{{message}}
+		{% if ssnexist %}
+			SSN already exists, please try again
+		{% else %}
+			{% if message %}
+				{{message}}
+			{% endif %}
 		{% endif %}
-	{% endif %}
+	</section>
 </body>
 </html>

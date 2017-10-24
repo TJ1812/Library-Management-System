@@ -9,7 +9,7 @@ myConnection = pymysql.connect( host=hostname, user=username, passwd=password, d
 
 def createTableBook(conn):
     cur = conn.cursor()
-    query = 'CREATE TABLE Book(Isbn VARCHAR(10) NOT NULL,ISBN13 VARCHAR(13) NOT NULL, Title VARCHAR(255), Availability INT NOT NULL DEFAULT 1, CONSTRAINT BKPK PRIMARY KEY(Isbn));'
+    query = 'CREATE TABLE Book(Isbn VARCHAR(10) NOT NULL, Title VARCHAR(255), Availability INT NOT NULL DEFAULT 1, CONSTRAINT BKPK PRIMARY KEY(Isbn));'
     cur.execute(query)
     print("Created Table Book")
 
@@ -42,10 +42,9 @@ def createTableBookLoans(conn):
 
 def createTableFines(conn):
     cur = conn.cursor()
-    query = 'CREATE TABLE Fines(Loan_id INT NOT NULL , Fine_amt REAL NOT NULL DEFAULT 0, CONSTRAINT FNPK PRIMARY KEY(Loan_id), CONSTRAINT FOREIGN KEY(Loan_id) REFERENCES Book_Loans(Loan_id) ON DELETE CASCADE);'
+    query = 'CREATE TABLE Fines(Loan_id INT NOT NULL , Fine_amt DECIMAL(9,2) NOT NULL DEFAULT 0, Paid INT DEFAULT 0, CONSTRAINT FNPK PRIMARY KEY(Loan_id), CONSTRAINT FOREIGN KEY(Loan_id) REFERENCES Book_Loans(Loan_id) ON DELETE CASCADE);'
     cur.execute(query)
     print("Created Table Fines")
-
 
 cursor = myConnection.cursor()
 cursor.execute("DROP SCHEMA library;")

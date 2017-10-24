@@ -2,73 +2,96 @@
 <html>
 <head>
 	<title>Book Search</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+ 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-	<h1>
-		Search for Books.
-	</h1>
+	<nav class="navbar navbar-inverse">
+	  <div class="container-fluid">
+	    <div class="navbar-header">
+	      <a class="navbar-brand" href="../">Library Management System</a>
+	    </div>
+	    <ul class="nav navbar-nav">
+	      <li><a href="../booksearch">Book Search</a></li>
+	      <li><a href="../checkinbooks">Check-In</a></li>
+	      <li><a href="../payfine">Pay Fine</a></li>
+	      <li><a href="../addborrowers">Add Borrowers</a></li>
+	    </ul>
+	  </div>
+	</nav>
+	<section align="center">
+		<h1>
+			Search for Books
+		</h1>
 
-	<form action="{% url 'booksearch:index' %}" method="post">
-		{% csrf_token %}
-		<input type="text" name="search" value="" />
-		<input type="submit" name="searchbtn">
-	</form>
+		<form action="{% url 'booksearch:index' %}" class="form-inline" method="post">
+			<div class="form-group">
+				{% csrf_token %}
+				<input type="text" name="search" class="form-control" value="" />
+				<input type="submit" class="btn btn-success" name="searchbtn">
+			</div>
+		</form>
 
-	{% if books %}	
-		<div>
-			Here are all books available
-			<table border="1" width="80%" align="center">
-			<tr>
-				<th>Isbn</th>
-				<th>Title</th>
-				<th>Author</th>
-				<th>Available</th>
-				<th>Check out</th>
-			</tr>
-			{% for book in books %}
-			<tr>
-				<td>{{ book.0 }}</td>
-				<td>{{ book.1 }}</td>
-				<td>{{ book.2 }}</td>
-				<td>
-					{% if book.3 == 1 %}
-						Yes
-					{% else %}
-						No
-					{% endif %}
-				</td>
-				<td>
-					<form action="{% url 'booksearch:index' %}" method="POST" id="card_no_form">
-						{% csrf_token %}
-						<input type="hidden" name="cardno" id="cardNo" value = {{book.0}} />
-					</form>
-					<button onclick="askCardNo();" name="checkout">Check Out</button>
-				</td>
-			</tr>
-			{% endfor %}
-			</table>
-		</div>
-	{% else %}
-		<h3>No Books Available</h3>
-	{% endif %}
-
-	<div id="loanInfo">
-		{% if message %}
-			{{ message }}
+		{% if books %}	
+			<div class="container">
+				<h3>Here are all books available</h3>
+				<table class="table table-striped">
+					<tr>
+						<th>Isbn</th>
+						<th>Title</th>
+						<th>Author</th>
+						<th>Available</th>
+						<th>Check out</th>
+					</tr>
+					{% for book in books %}
+					<tr>
+						<td>{{ book.0 }}</td>
+						<td>{{ book.1 }}</td>
+						<td>{{ book.2 }}</td>
+						<td>
+							{% if book.3 == 1 %}
+								Yes
+							{% else %}
+								No
+							{% endif %}
+						</td>
+						<td>
+							<form action="{% url 'booksearch:index' %}" method="POST">
+								{% csrf_token %}
+								<input type="hidden" name='cardno' id={{book.0}} />
+								<button onclick="askCardNo({{book.0}});" class="btn" name="checkout" type="submit">Check Out</button>
+							</form>
+							
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+			</div>
+		{% else %}
+			{% if get == False %}
+				<h3>No Books Available</h3>
+			{% endif %}
 		{% endif %}
-	</div>
 
-	<script type="text/javascript">
-		function askCardNo()
-		{
-			var card_no = prompt("Enter Card Number");
-			if(card_no != null)
+		<div id="loanInfo">
+			{% if message %}
+				{{ message }}
+			{% endif %}
+		</div>
+
+		<script type="text/javascript">
+			function askCardNo(isbn)
 			{
-				var isbn = document.getElementById('cardNo').value 
-				document.getElementById('cardNo').value = card_no +','+isbn;
-				document.getElementById('card_no_form').submit();
+				var card_no = prompt("Enter Card Number");
+				if(card_no != null)
+				{ 
+					document.getElementById(isbn).value = card_no +','+isbn;
+				}
 			}
-		}
-	</script>
+		</script>
+	</section>
 </body>
 </html>
